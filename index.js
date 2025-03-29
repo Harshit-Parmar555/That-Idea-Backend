@@ -12,10 +12,12 @@ import { connectDb } from "./src/db/connect.js";
 // Express app
 const app = express();
 
+const FRONTEND_URL = process.env.NODE_ENV === "development" ? "http://localhost:5173" : process.env.FRONTEND_URL;
+
 // Middlewares
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: FRONTEND_URL,
     credentials: true,
   })
 );
