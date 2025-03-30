@@ -6,9 +6,9 @@ import mongoose from "mongoose";
 // Add start controller
 export const addIdea = async (req, res) => {
   try {
-    const { name, description, pitch } = req.body;
+    const { name, description, pitch, category } = req.body;
 
-    if (!name || !description || !pitch) {
+    if (!name || !description || !pitch || !category) {
       return res
         .status(400)
         .json({ success: false, message: "Please provide all fields" });
@@ -38,6 +38,7 @@ export const addIdea = async (req, res) => {
         name,
         description,
         pitch,
+        category,
         coverImage: coverImgURL,
         user: req.user._id, // req.user is already set by middleware
       });
@@ -155,8 +156,9 @@ export const searchIdea = async (req, res) => {
       $or: [
         { name: { $regex: query, $options: "i" } },
         { para: { $regex: query, $options: "i" } },
+        { category: { $regex: query, $options: "i" } },
       ],
-    });
+    }).populate("user"); // Populating user details
 
     return res.status(200).json({
       success: true,
