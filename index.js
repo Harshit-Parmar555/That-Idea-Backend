@@ -12,6 +12,7 @@ import { connectDb } from "./src/db/connect.js";
 // Express app
 const app = express();
 
+// Frontend URL
 const FRONTEND_URL =
   process.env.NODE_ENV === "development"
     ? "http://localhost:5173"
@@ -45,7 +46,7 @@ app.use(cookieParser());
 //   })
 // );
 
-// PORT
+// Port
 const PORT = process.env.PORT || 4000;
 
 // App routes

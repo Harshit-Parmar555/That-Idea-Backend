@@ -172,6 +172,7 @@ export const searchIdea = async (req, res) => {
   }
 };
 
+// Get view user
 export const getViewUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -218,6 +219,7 @@ export const getViewUser = async (req, res) => {
   }
 };
 
+// Toggle like
 export const toggleLikeIdea = async (req, res) => {
   try {
     const { id } = req.params;
@@ -254,6 +256,7 @@ export const toggleLikeIdea = async (req, res) => {
   }
 };
 
+// Get Single Idea
 export const getIdea = async (req, res) => {
   try {
     const { id } = req.params;
