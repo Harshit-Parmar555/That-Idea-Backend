@@ -223,6 +223,8 @@ export const getViewUser = async (req, res) => {
 export const toggleLikeIdea = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user._id;
+
     if (!id) {
       return res
         .status(400)
@@ -236,22 +238,35 @@ export const toggleLikeIdea = async (req, res) => {
         .json({ success: false, message: "Idea not found" });
     }
 
-    const userId = req.user._id.toString();
-    const isLiked = idea.likes.includes(userId);
+    const userIdStr = userId.toString();
+    const likeIndex = idea.likes.findIndex(
+      (like) => like.toString() === userIdStr
+    );
 
-    if (isLiked) {
-      idea.likes = idea.likes.filter((like) => like.toString() !== userId);
+    if (likeIndex > -1) {
+      idea.likes.splice(likeIndex, 1); // remove like
       await idea.save();
-      return res.status(200).json({ success: true, message: "Idea unliked" });
+      return res.status(200).json({
+        success: true,
+        message: "Idea unliked",
+        liked: false,
+        totalLikes: idea.likes.length,
+      });
+    } else {
+      idea.likes.push(userId);
+      await idea.save();
+      return res.status(200).json({
+        success: true,
+        message: "Idea liked",
+        liked: true,
+        totalLikes: idea.likes.length,
+      });
     }
-
-    idea.likes.push(userId);
-    await idea.save();
-    return res.status(200).json({ success: true, message: "Idea liked" });
   } catch (error) {
+    console.log(error)
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Server error: " + error.message,
     });
   }
 };
