@@ -48,12 +48,7 @@ export const signup = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Sign Up Successful",
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        avatar: user.avatar,
-      },
+      user,
     });
   } catch (error) {
     console.error("Signup Error:", error.message);
