@@ -30,9 +30,7 @@ export const signup = async (req, res) => {
     let user = await User.findOne({ email });
 
     if (!user) {
-      const firstLetter = name.charAt(0).toUpperCase();
-      const avatarUrl = `https://ui-avatars.com/api/?name=${firstLetter}&length=1&background=random&color=fff&size=128&rounded=true`;
-      user = new User({ username: name, email, avatar: avatarUrl });
+      user = new User({ username: name, email, avatar: picture });
       await user.save();
     }
 
