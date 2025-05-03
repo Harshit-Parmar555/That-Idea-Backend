@@ -71,7 +71,7 @@ Make sure you have the following installed:
 ### Authentication
 - **POST /api/v1/users/signup** - User login using Firebase
 - **GET /api/v1/users/logout** - User logout
-- - **GET /api/v1/users/checkAuth** - User Check Auth
+- **GET /api/v1/users/checkAuth** - User Check Auth
 
 ### Ideas
 - **POST /api/v1/ideas/addIdea** - Create a new idea
@@ -97,5 +97,5 @@ This project is licensed under the MIT License.
 For any queries or suggestions, feel free to reach out:
 - **Developer**: Harshit Parmar
 - **Email**: parmarharshit441@gmail.com
-- **LinkedIn**: [Your Profile](https://www.linkedin.com/in/harshit-parmar-47253b282)
+- **LinkedIn**: [Profile](https://www.linkedin.com/in/harshit-parmar-47253b282)
 
