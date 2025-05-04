@@ -1,6 +1,7 @@
 import { Idea } from "../models/idea.model.js";
 import { uploadImageToFirebase } from "../utils/uploadImg.js";
 import { User } from "../models/user.model.js";
+import { getSortOption } from "../utils/sortHelper.js";
 import mongoose from "mongoose";
 
 // Add start controller
@@ -75,12 +76,24 @@ export const addIdea = async (req, res) => {
 // Get starts controller
 export const getIdeas = async (req, res) => {
   try {
-    const allIdeas = await Idea.find().populate("user");
-    return res.status(200).json({
-      success: true,
-      message: "All startup Ideas fetched successfully",
-      Ideas: allIdeas,
-    });
+    const { sortBy } = req.query;
+
+    let query = Idea.find().populate("user");
+    const sortOption = getSortOption(sortBy);
+
+    if (sortOption) {
+      query = query.sort(sortOption);
+      const results = await query;
+      return res.status(200).json({ success: true, Ideas: results });
+    }
+
+    // Popular: handled manually
+    const ideas = await query.lean();
+    const sorted = ideas
+      .map((i) => ({ ...i, likesCount: i.likes?.length || 0 }))
+      .sort((a, b) => b.likesCount - a.likesCount);
+
+    return res.status(200).json({ success: true, Ideas: sorted });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
@@ -143,32 +156,41 @@ export const deleteIdea = async (req, res) => {
 // Search start controller
 export const searchIdea = async (req, res) => {
   try {
-    const { query } = req.query;
+    const { query, sortBy } = req.query;
 
     if (!query) {
-      return res.status(400).json({
-        success: false,
-        message: "Search query is required",
-      });
+      return res
+        .status(400)
+        .json({ success: false, message: "Query required" });
     }
 
-    const results = await Idea.find({
+    const searchFilter = {
       $or: [
         { name: { $regex: query, $options: "i" } },
-        { para: { $regex: query, $options: "i" } },
+        { description: { $regex: query, $options: "i" } },
+        { pitch: { $regex: query, $options: "i" } },
         { category: { $regex: query, $options: "i" } },
       ],
-    }).populate("user"); // Populating user details
+    };
 
-    return res.status(200).json({
-      success: true,
-      results,
-    });
+    let queryBuilder = Idea.find(searchFilter).populate("user");
+    const sortOption = getSortOption(sortBy);
+
+    if (sortOption) {
+      queryBuilder = queryBuilder.sort(sortOption);
+      const results = await queryBuilder;
+      return res.status(200).json({ success: true, results });
+    }
+
+    // Popular: handled manually
+    const ideas = await queryBuilder.lean();
+    const sorted = ideas
+      .map((i) => ({ ...i, likesCount: i.likes?.length || 0 }))
+      .sort((a, b) => b.likesCount - a.likesCount);
+
+    return res.status(200).json({ success: true, results: sorted });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -263,7 +285,7 @@ export const toggleLikeIdea = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).json({
       success: false,
       message: "Server error: " + error.message,
