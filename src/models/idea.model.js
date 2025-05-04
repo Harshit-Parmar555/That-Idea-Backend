@@ -33,7 +33,6 @@ const ideaSchema = new mongoose.Schema(
         ref: "user",
       },
     ],
-
     category: {
       type: String,
       required: true,
